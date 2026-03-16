@@ -1,0 +1,44 @@
+{
+  "manifest_version": 3,
+  "name": "쿠팡 영상 소재 수집기",
+  "version": "1.1.0",
+  "description": "쿠팡 상품 페이지에서 키워드를 추출하고 AI 대본/TTS/자막/썸네일을 생성해주는 확장프로그램",
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "scripting",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://www.coupang.com/*",
+    "https://translate.googleapis.com/*",
+    "https://translate.google.com/*",
+    "https://api.anthropic.com/*"
+  ],
+  "action": {
+    "default_title": "쿠팡 영상 소재 수집기 열기",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.coupang.com/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

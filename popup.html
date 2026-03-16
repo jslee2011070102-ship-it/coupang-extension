@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠팡 영상 소재 수집기</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 헤더 -->
+  <header class="header">
+    <h1 class="header-title">🎬 영상 소재 수집기</h1>
+    <button id="btn-settings" class="btn-icon" title="설정">⚙️</button>
+  </header>
+
+  <!-- 메인 컨텐츠 -->
+  <main class="main-content">
+
+    <!-- 섹션: 키워드 표시 -->
+    <section id="section-keyword" class="section">
+      <div id="keyword-loading" class="hidden">
+        <span class="spinner"></span>
+        <span class="text-small" style="margin-left:8px;">키워드 추출 중...</span>
+      </div>
+
+      <!-- 쿠팡 페이지가 아닐 때 -->
+      <div id="keyword-not-coupang" class="hidden">
+        <div class="alert alert-warning">
+          🛒 쿠팡 상품 페이지에서 실행해주세요
+        </div>
+      </div>
+
+      <!-- 키워드 표시 -->
+      <div id="keyword-result" class="hidden">
+        <div class="keyword-box">
+          <span class="text-small">추출 키워드</span>
+          <strong id="keyword-ko" class="keyword-text"></strong>
+        </div>
+        <div class="keyword-translations text-small mt-8" id="keyword-translations"></div>
+      </div>
+
+      <!-- 에러 -->
+      <div id="keyword-error" class="hidden">
+        <div class="alert alert-error" id="keyword-error-msg"></div>
+      </div>
+    </section>
+
+    <!-- 탭 네비게이션 -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="tab-search">🎬 영상</button>
+      <button class="tab-btn" data-tab="tab-script">📝 대본</button>
+      <button class="tab-btn" data-tab="tab-thumbnail">🖼️ 썸네일</button>
+      <button class="tab-btn" data-tab="tab-package">📦 패키징</button>
+    </nav>
+
+    <!-- 탭 1: 영상 소스 -->
+    <div id="tab-search" class="tab-content active">
+
+      <!-- 플레이스홀더 (쿠팡 페이지 아닐 때) -->
+      <div id="search-links-placeholder" class="placeholder-text">
+        쿠팡 상품 페이지를 열면<br>영상 소스가 표시됩니다
+      </div>
+
+      <!-- 섹션 B: 쇼츠 & SNS -->
+      <div id="section-sns-links" class="hidden mt-12">
+        <div class="link-group-title">📲 쇼츠 &amp; SNS</div>
+        <div id="links-sns" class="link-list"></div>
+      </div>
+
+      <!-- 섹션 C: 해외 쇼핑몰 -->
+      <div id="section-shop-links" class="hidden mt-12">
+        <div class="link-group-title">
+          🛒 해외 쇼핑몰
+          <span class="link-group-hint">제품 이미지 영역 + 리뷰 영역에 영상 있음</span>
+        </div>
+        <div id="links-shop" class="link-list"></div>
+      </div>
+
+    </div>
+
+    <!-- 탭 2: AI 대본 / TTS / 자막 -->
+    <div id="tab-script" class="tab-content">
+
+      <!-- 제품 분석 카드 (키워드 추출 완료 시 표시) -->
+      <div id="product-info-card" class="hidden product-card">
+        <div class="product-card-title">📦 분석된 제품 정보</div>
+        <div id="product-card-body" class="product-card-body"></div>
+      </div>
+
+      <!-- 쿠팡 페이지 아닐 때 안내 -->
+      <div id="script-no-product" class="hidden">
+        <div class="alert alert-warning">
+          🛒 쿠팡 상품 페이지를 먼저 열어주세요
+        </div>
+      </div>
+
+      <!-- 추가 지시사항 (선택) -->
+      <div class="form-group mt-8" id="script-extra-wrap">
+        <label for="input-extra">추가 지시사항 <span class="text-muted">(선택)</span></label>
+        <textarea id="input-extra" rows="2"
+          placeholder="예) 20대 여성 타겟, 운동 효과 강조, 가성비 위주로 써줘"></textarea>
+      </div>
+
+      <!-- 대본 자동 생성 버튼 -->
+      <button id="btn-generate-script" class="btn btn-primary w-full mt-8 btn-auto-gen">
+        ✨ AI 대본 자동 생성
+      </button>
+
+      <!-- 생성 결과 -->
+      <div id="script-result" class="hidden mt-8">
+
+        <!-- 제목 후보 3개 -->
+        <div class="result-section-header">
+          <span class="result-section-label">🏷️ 제목 후보</span>
+          <button id="btn-regen-script" class="btn btn-secondary btn-sm">🔄 재생성</button>
+        </div>
+        <div id="title-candidates" class="title-candidates"></div>
+        <div class="text-small mt-4" style="color:#aaa;">→ 클릭하면 선택 (썸네일 제목에도 자동 반영)</div>
+
+        <!-- 대본 -->
+        <div class="result-section-header mt-12">
+          <span class="result-section-label">📝 대본</span>
+          <span class="text-muted">직접 수정 가능</span>
+        </div>
+        <textarea id="output-script" rows="8" placeholder="대본이 여기에 표시됩니다..."></textarea>
+
+        <div class="btn-row mt-8">
+          <button id="btn-generate-tts" class="btn btn-primary" style="flex:1">🎙️ 음성 생성</button>
+        </div>
+
+        <!-- TTS 결과 -->
+        <div id="tts-result" class="hidden mt-12">
+          <label>생성된 음성</label>
+          <div class="audio-player">
+            <audio id="audio-player" controls style="width:100%"></audio>
+          </div>
+          <button id="btn-download-audio" class="btn btn-secondary w-full mt-8">⬇️ WAV 다운로드</button>
+        </div>
+
+        <!-- SRT 결과 -->
+        <div id="srt-result" class="hidden mt-12">
+          <label>자막 (SRT)</label>
+          <textarea id="output-srt" rows="5" readonly style="font-size:11px; font-family:monospace;"></textarea>
+          <button id="btn-download-srt" class="btn btn-secondary w-full mt-8">⬇️ SRT 다운로드</button>
+        </div>
+      </div>
+
+      <!-- 로딩 -->
+      <div id="script-loading" class="hidden mt-12 text-center">
+        <span class="spinner"></span>
+        <span class="text-small" style="margin-left:8px;" id="script-loading-msg">처리 중...</span>
+      </div>
+
+      <!-- 에러 -->
+      <div id="script-error" class="hidden mt-8">
+        <div class="alert alert-error" id="script-error-msg"></div>
+      </div>
+
+    </div>
+
+    <!-- 탭 3: 썸네일 에디터 (9:16 쇼츠 레이아웃) -->
+    <div id="tab-thumbnail" class="tab-content">
+
+      <!-- 입력 그리드 -->
+      <div class="thumb-input-grid">
+
+        <!-- 채널명 -->
+        <div class="form-group">
+          <label for="thumb-channel">① 채널명</label>
+          <input type="text" id="thumb-channel" placeholder="갓성비 추천템">
+        </div>
+
+        <!-- 영상 제목 -->
+        <div class="form-group mt-8">
+          <label for="thumb-title">② 영상 제목 <span class="text-muted">(대본 탭에서 선택 시 자동 입력)</span></label>
+          <input type="text" id="thumb-title" placeholder="미친기능 숨어있는 레전드공구">
+        </div>
+
+        <!-- 자막 -->
+        <div class="form-group mt-8">
+          <label for="thumb-subtitle">③ 자막 텍스트</label>
+          <input type="text" id="thumb-subtitle" placeholder="손잡이 모양이 손에 완벽하게 맞는데다">
+        </div>
+
+        <!-- 스타일 옵션 -->
+        <div class="form-row mt-8">
+          <div class="form-group" style="flex:2">
+            <label>폰트</label>
+            <select id="thumb-font" class="select-input">
+              <option value="'Noto Sans KR', sans-serif">고딕 (기본)</option>
+              <option value="'Noto Serif KR', serif">명조</option>
+              <option value="Impact, 'Arial Black', sans-serif">임팩트</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1; margin-left:8px;">
+            <label>채널 강조색</label>
+            <input type="color" id="thumb-accent-color" value="#e8133a" class="color-input">
+          </div>
+        </div>
+
+        <!-- 이미지 업로드 -->
+        <div class="form-group mt-8">
+          <label>④ 제품 이미지 <span class="text-muted">(선택)</span></label>
+          <div class="image-upload-row">
+            <div id="thumb-image-preview" class="image-preview-box">
+              <span class="text-small" style="color:#bbb;">이미지 없음</span>
+            </div>
+            <div class="image-upload-buttons">
+              <label for="thumb-image-input" class="btn btn-secondary btn-sm" style="cursor:pointer;display:flex;align-items:center;justify-content:center;">📁 파일 선택</label>
+              <input type="file" id="thumb-image-input" accept="image/*" style="display:none;">
+              <button id="btn-thumb-image-clear" class="btn btn-secondary btn-sm mt-4">🗑 제거</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 미리보기 캔버스 (9:16) -->
+      <div class="thumb-preview-container mt-12">
+        <canvas id="thumb-canvas"></canvas>
+      </div>
+
+      <button id="btn-save-thumbnail" class="btn btn-primary w-full mt-8">
+        💾 썸네일 저장 (PNG 1080×1920)
+      </button>
+
+    </div>
+
+    <!-- 탭 4: ZIP 패키징 -->
+    <div id="tab-package" class="tab-content">
+      <div class="checklist">
+        <div class="checklist-item" id="check-script">
+          <span class="check-icon">⬜</span>
+          <span>AI 대본 생성</span>
+        </div>
+        <div class="checklist-item" id="check-audio">
+          <span class="check-icon">⬜</span>
+          <span>TTS 음성 생성</span>
+        </div>
+        <div class="checklist-item" id="check-srt">
+          <span class="check-icon">⬜</span>
+          <span>SRT 자막 생성</span>
+        </div>
+        <div class="checklist-item" id="check-thumbnail">
+          <span class="check-icon">⬜</span>
+          <span>썸네일 생성</span>
+        </div>
+      </div>
+
+      <div id="package-warning" class="hidden">
+        <div class="alert alert-warning mt-12" id="package-warning-msg"></div>
+      </div>
+
+      <button id="btn-download-zip" class="btn btn-primary w-full mt-12">
+        📦 소재 패키징 다운로드
+      </button>
+
+      <div id="package-loading" class="hidden mt-8 text-center">
+        <span class="spinner"></span>
+        <span class="text-small" style="margin-left:8px;">ZIP 생성 중...</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 설정 패널 -->
+  <div id="settings-panel" class="settings-panel hidden">
+    <div class="settings-header">
+      <h2>⚙️ 설정</h2>
+      <button id="btn-settings-close" class="btn-icon">✕</button>
+    </div>
+    <div class="settings-body">
+      <div class="form-group">
+        <label for="input-api-key">Claude API 키</label>
+        <div class="api-key-row">
+          <input type="password" id="input-api-key" placeholder="sk-ant-..." autocomplete="off">
+          <button id="btn-toggle-key" class="btn btn-secondary" style="margin-left:6px;padding:8px 10px;">👁</button>
+        </div>
+        <div class="text-small mt-8" style="color:#888;">
+          <a href="https://console.anthropic.com" target="_blank" style="color:#e8133a;">console.anthropic.com</a>
+          에서 발급
+        </div>
+      </div>
+      <button id="btn-save-key" class="btn btn-primary w-full mt-12">저장</button>
+      <div id="key-saved-msg" class="hidden">
+        <div class="alert alert-success mt-8">✅ API 키가 저장되었습니다</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSZip (4단계) -->
+  <script src="jszip.min.js"></script>
+  <script src="tts.js"></script>
+  <script src="thumbnail.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

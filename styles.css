@@ -1,0 +1,632 @@
+/*
+ * styles.css
+ * 역할: 확장프로그램 팝업 UI 스타일
+ * 팝업 크기: 360px × 600px
+ */
+
+/* ===== 리셋 & 기본 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  min-width: 320px;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: #1a1a2e;
+  background: #f8f9fa;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== 헤더 ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #e8133a;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* ===== 버튼 공통 ===== */
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 17px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  color: white;
+  line-height: 1;
+}
+
+.btn-icon:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: #e8133a;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #c0102f;
+}
+
+.btn-secondary {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== 메인 영역 ===== */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 44px);
+  overflow: hidden;
+}
+
+/* ===== 키워드 섹션 ===== */
+.section {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e9ecef;
+  background: white;
+  flex-shrink: 0;
+}
+
+.keyword-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keyword-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.keyword-translations {
+  color: #888;
+  font-size: 11px;
+}
+
+/* ===== 탭 네비게이션 ===== */
+.tab-nav {
+  display: flex;
+  background: white;
+  border-bottom: 2px solid #e9ecef;
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 7px 2px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  color: #999;
+  transition: all 0.15s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: inherit;
+}
+
+.tab-btn:hover {
+  color: #e8133a;
+  background: #fff5f7;
+}
+
+.tab-btn.active {
+  color: #e8133a;
+  border-bottom-color: #e8133a;
+}
+
+/* ===== 탭 컨텐츠 ===== */
+.tab-content {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ===== 플레이스홀더 ===== */
+.placeholder-text {
+  text-align: center;
+  color: #bbb;
+  font-size: 12px;
+  line-height: 1.8;
+  padding: 20px 0;
+}
+
+/* ===== 입력 요소 ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: flex;
+  gap: 8px;
+}
+
+input[type="text"],
+input[type="password"],
+textarea,
+select {
+  width: 100%;
+  padding: 7px 9px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  transition: border 0.15s;
+  outline: none;
+  background: white;
+  resize: vertical;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #e8133a;
+  box-shadow: 0 0 0 2px rgba(232,19,58,0.1);
+}
+
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.select-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  padding-right: 24px;
+}
+
+.range-input {
+  width: 100%;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  accent-color: #e8133a;
+}
+
+.color-input {
+  width: 100%;
+  height: 32px;
+  padding: 2px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.api-key-row {
+  display: flex;
+  align-items: center;
+}
+
+/* ===== 검색/영상 링크 ===== */
+.link-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+/* 섹션 타이틀 힌트 텍스트 */
+.link-group-hint {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: #aaa;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 7px;
+  text-decoration: none;
+  color: #1a1a2e;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s;
+}
+
+.link-item:hover {
+  border-color: #e8133a;
+  background: #fff5f7;
+  color: #e8133a;
+}
+
+.link-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ===== 알림 메시지 ===== */
+.alert {
+  padding: 9px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.alert-info {
+  background: #e8f4fd;
+  color: #1a6fa8;
+  border-left: 3px solid #1a6fa8;
+}
+
+.alert-warning {
+  background: #fff8e1;
+  color: #856404;
+  border-left: 3px solid #ffc107;
+}
+
+.alert-error {
+  background: #fdecea;
+  color: #c62828;
+  border-left: 3px solid #e53935;
+}
+
+.alert-success {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-left: 3px solid #43a047;
+}
+
+/* ===== 로딩 스피너 ===== */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(232,19,58,0.2);
+  border-top-color: #e8133a;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ===== 오디오 플레이어 ===== */
+.audio-player audio {
+  height: 32px;
+}
+
+/* ===== 썸네일 미리보기 (9:16 세로형) ===== */
+.thumb-preview-container {
+  /* 팝업 너비(360px) - 패딩(28px) = 332px 기준으로 9:16 높이 계산 */
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #f0f0f0;
+  max-height: 480px;    /* 팝업 높이 초과 방지 */
+}
+
+.thumb-preview-container canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== 이미지 업로드 영역 ===== */
+.image-upload-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.image-preview-box {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border: 1.5px dashed #ddd;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  overflow: hidden;
+  text-align: center;
+}
+
+.image-upload-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+/* thumb-input-grid 입력 영역 */
+.thumb-input-grid {
+  /* 입력 항목들을 깔끔하게 쌓기 */
+}
+
+/* ===== 패키징 체크리스트 ===== */
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.checklist-item.done {
+  border-color: #43a047;
+  background: #f1f8f1;
+  color: #2e7d32;
+}
+
+.check-icon {
+  font-size: 16px;
+}
+
+/* ===== 버튼 행 ===== */
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+/* ===== 설정 패널 ===== */
+.settings-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-panel.hidden {
+  display: none;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #e8133a;
+  color: white;
+  flex-shrink: 0;
+}
+
+.settings-header h2 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.settings-body {
+  flex: 1;
+  padding: 18px 14px;
+  overflow-y: auto;
+}
+
+/* ===== 제품 분석 카드 (대본 탭) ===== */
+.product-card {
+  background: #fff8f9;
+  border: 1px solid #f5c6ce;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-bottom: 0;
+}
+
+.product-card-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #e8133a;
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.product-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.product-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.product-label {
+  color: #999;
+  font-weight: 600;
+  flex-shrink: 0;
+  min-width: 48px;
+}
+
+.product-value {
+  color: #333;
+  word-break: keep-all;
+}
+
+/* ===== 제목 후보 카드 ===== */
+.title-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.title-card {
+  padding: 8px 11px;
+  background: white;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.5;
+  word-break: keep-all;
+}
+
+.title-card:hover {
+  border-color: #e8133a;
+  background: #fff5f7;
+  color: #e8133a;
+}
+
+.title-card.selected {
+  border-color: #e8133a;
+  background: #fff0f3;
+  color: #c0102f;
+  box-shadow: 0 0 0 2px rgba(232,19,58,0.12);
+}
+
+/* ===== 결과 섹션 헤더 ===== */
+.result-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.result-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #555;
+}
+
+.mt-4 { margin-top: 4px; }
+
+/* ===== 대본 생성 버튼 강조 ===== */
+.btn-auto-gen {
+  font-size: 13px !important;
+  padding: 10px !important;
+  letter-spacing: -0.2px;
+}
+
+/* ===== 대본 결과 헤더 ===== */
+.script-result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.script-result-header label {
+  margin-bottom: 0;
+}
+
+.btn-sm {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+}
+
+/* ===== 텍스트 보조 색 ===== */
+.text-muted {
+  color: #aaa;
+  font-weight: 400;
+  font-size: 10px;
+}
+
+/* ===== 유틸리티 ===== */
+.hidden {
+  display: none !important;
+}
+
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-12 { margin-bottom: 12px; }
+
+.text-small {
+  font-size: 11px;
+  color: #888;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.w-full {
+  width: 100%;
+}
