@@ -24,7 +24,8 @@ function extractProductInfo() {
     reviewCount: null,
     category: null,
     features: [],
-    description: null
+    description: null,
+    imageUrl: null
   };
 
   // ── 키워드 (URL q= 파라미터) ──
@@ -177,6 +178,21 @@ function extractProductInfo() {
 
   // 중복 제거 + 최대 5개
   info.features = [...new Set(info.features)].slice(0, 5);
+
+  // ── 상품 대표 이미지 (썸네일 1장) ──
+  const imageSelectors = [
+    '.prod-image__detail img',
+    '.prod-carousel__item img',
+    '[class*="prod-image"] img',
+    '.img-cf'
+  ];
+  for (const sel of imageSelectors) {
+    const el = document.querySelector(sel);
+    if (el && el.src && el.src.startsWith('http') && el.src.includes('coupang')) {
+      info.imageUrl = el.src.split('?')[0];
+      break;
+    }
+  }
 
   // ── 상품 설명 (첫 텍스트 단락) ──
   const descSelectors = [

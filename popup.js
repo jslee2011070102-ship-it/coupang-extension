@@ -9,6 +9,7 @@ const state = {
   keywordEn: '',
   keywordZh: '',
   productInfo: null,      // 쿠팡 페이지에서 추출한 제품 전체 정보
+  imageUrl: null,         // 쿠팡 상품 대표 이미지 URL
   script: '',
   titleCandidates: [],    // 생성된 제목 후보 3개
   selectedTitle: '',      // 선택된 제목
@@ -131,6 +132,7 @@ async function initKeyword() {
   // 상태 저장
   state.productInfo = info;
   state.keyword = info.keyword;
+  state.imageUrl = info.imageUrl || null;
 
   // 키워드 헤더 표시
   $('keyword-ko').textContent = info.title || info.keyword;
@@ -241,10 +243,25 @@ function renderShopLinks(keywordEn, keywordZh) {
   show('section-shop-links');
 }
 
+// ── 섹션 D: 이미지 검색 링크 ──
+function renderImageSearchLinks(imageUrl) {
+  if (!imageUrl) return;
+
+  const enc = encodeURIComponent(imageUrl);
+  buildLinkItems('links-image', [
+    { icon: '🔍', name: 'Google Lens',
+      url: `https://lens.google.com/uploadbyurl?url=${enc}` },
+    { icon: '🔎', name: 'Bing Visual Search',
+      url: `https://www.bing.com/images/search?view=detailv2&iss=sbi&FORM=SBIVSP&imgurl=${enc}` },
+  ]);
+  show('section-image-links');
+}
+
 // ── renderSearchLinks: translateKeyword()에서 호출 ──
 function renderSearchLinks() {
   renderSnsLinks(state.keywordEn, state.keywordZh);
   renderShopLinks(state.keywordEn, state.keywordZh);
+  renderImageSearchLinks(state.imageUrl);
 }
 
 // ===== 2단계: AI 제목 + 대본 생성 (쇼핑쇼츠 가이드 기반) =====
@@ -746,6 +763,7 @@ function resetProductState() {
   state.keywordEn     = '';
   state.keywordZh     = '';
   state.productInfo   = null;
+  state.imageUrl      = null;
   state.script        = '';
   state.titleCandidates = [];
   state.selectedTitle = '';
@@ -764,6 +782,7 @@ function resetProductState() {
   // 영상 탭 초기화
   hide('section-sns-links');
   hide('section-shop-links');
+  hide('section-image-links');
   show('search-links-placeholder');
   hide('script-loading');
   hide('script-error');
