@@ -247,19 +247,18 @@ function renderSearchLinks() {
   renderShopLinks(state.keywordEn, state.keywordZh);
 }
 
-// ===== 이미지 검색 (Ctrl+V 붙여넣기) =====
+// ===== 이미지 검색 (Ctrl+V 붙여넣기 → 자동 주입) =====
+
+let pastedImageBlob = null;  // 전역 보관
 
 (function initImageSearch() {
-  const pasteZone  = $('image-paste-zone');
-  const pasteHint  = $('image-paste-hint');
-  const preview    = $('image-paste-preview');
-  const clearRow   = $('image-paste-clear-row');
-  const linksWrap  = $('image-search-links');
+  const pasteZone = $('image-paste-zone');
+  const pasteHint = $('image-paste-hint');
+  const preview   = $('image-paste-preview');
 
-  // 이미지 표시 공통 함수
-  function showPastedImage(blobOrUrl) {
-    const url = typeof blobOrUrl === 'string' ? blobOrUrl : URL.createObjectURL(blobOrUrl);
-    preview.src = url;
+  function showPastedImage(blob) {
+    pastedImageBlob = blob;
+    preview.src = URL.createObjectURL(blob);
     preview.style.display = 'block';
     pasteHint.style.display = 'none';
     show('image-paste-clear-row');
@@ -269,6 +268,7 @@ function renderSearchLinks() {
 
   // 이미지 제거
   $('btn-image-paste-clear').addEventListener('click', () => {
+    pastedImageBlob = null;
     preview.src = '';
     preview.style.display = 'none';
     pasteHint.style.display = '';
@@ -277,30 +277,26 @@ function renderSearchLinks() {
     pasteZone.classList.remove('focused');
   });
 
-  // 클릭 시 포커스
+  // 클릭 → 포커스
   pasteZone.addEventListener('click', () => pasteZone.focus());
   pasteZone.addEventListener('focus', () => pasteZone.classList.add('focused'));
   pasteZone.addEventListener('blur',  () => pasteZone.classList.remove('focused'));
 
-  // Ctrl+V 이미지 붙여넣기 — 전체 document에서 수신
+  // Ctrl+V — document 전체에서 수신
   document.addEventListener('paste', (e) => {
     const items = e.clipboardData?.items;
     if (!items) return;
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         const blob = item.getAsFile();
-        if (blob) showPastedImage(blob);
-        break;
+        if (blob) { showPastedImage(blob); break; }
       }
     }
   });
 
-  // 드래그 앤 드롭도 지원
-  pasteZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    pasteZone.classList.add('drag-over');
-  });
-  pasteZone.addEventListener('dragleave', () => pasteZone.classList.remove('drag-over'));
+  // 드래그 앤 드롭
+  pasteZone.addEventListener('dragover',  (e) => { e.preventDefault(); pasteZone.classList.add('drag-over'); });
+  pasteZone.addEventListener('dragleave', ()  => pasteZone.classList.remove('drag-over'));
   pasteZone.addEventListener('drop', (e) => {
     e.preventDefault();
     pasteZone.classList.remove('drag-over');
@@ -309,17 +305,108 @@ function renderSearchLinks() {
   });
 })();
 
+/** Blob → base64 data URL */
+function blobToBase64(blob) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.readAsDataURL(blob);
+  });
+}
+
+/** 새 탭 열고 이미지 자동 주입 */
+async function openImageSearchTab(url, injectFn) {
+  if (!pastedImageBlob) return;
+
+  const base64 = await blobToBase64(pastedImageBlob);
+  const tab    = await chrome.tabs.create({ url, active: true });
+
+  const listener = async (tabId, info) => {
+    if (tabId !== tab.id || info.status !== 'complete') return;
+    chrome.tabs.onUpdated.removeListener(listener);
+
+    // 페이지 JS 초기화 시간 대기 (SPA 렌더링)
+    await new Promise(r => setTimeout(r, 1200));
+
+    try {
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: injectFn,
+        args: [base64]
+      });
+    } catch (e) {
+      console.warn('Image inject failed:', e.message);
+    }
+  };
+  chrome.tabs.onUpdated.addListener(listener);
+}
+
+/** 이미지 inject 공통 로직 (base64 → File → input[type=file] 설정) */
+function _injectImageToFileInput(base64) {
+  function b64ToFile(b64) {
+    const arr  = b64.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    const u8   = new Uint8Array(bstr.length);
+    for (let i = 0; i < bstr.length; i++) u8[i] = bstr.charCodeAt(i);
+    return new File([u8], 'image.png', { type: mime });
+  }
+
+  const file = b64ToFile(base64);
+  const dt   = new DataTransfer();
+  dt.items.add(file);
+
+  // 모든 file input에 설정 시도
+  const inputs = document.querySelectorAll('input[type="file"]');
+  inputs.forEach(input => {
+    try {
+      input.files = dt.files;
+      ['change', 'input'].forEach(name =>
+        input.dispatchEvent(new Event(name, { bubbles: true }))
+      );
+    } catch (_) {}
+  });
+
+  // Drop 이벤트로도 시도 (파일 input이 숨어있는 경우)
+  const dropTargets = [
+    document.querySelector('[role="img"][draggable]'),
+    document.querySelector('[data-drop-zone]'),
+    document.querySelector('.upload-content'),
+    document.querySelector('main'),
+    document.body
+  ].filter(Boolean);
+
+  dropTargets.slice(0, 2).forEach(target => {
+    try {
+      ['dragenter', 'dragover', 'drop'].forEach(name => {
+        target.dispatchEvent(new DragEvent(name, {
+          bubbles: true, cancelable: true, dataTransfer: dt
+        }));
+      });
+    } catch (_) {}
+  });
+}
+
+/** 이미지 검색 버튼 렌더링 (버튼 클릭 → 자동 inject) */
 function renderImageSearchLinks() {
-  buildLinkItems('links-image-search', [
-    { icon: '🔍', name: 'Google Lens',
-      url: 'https://lens.google.com/' },
-    { icon: '🏭', name: '1688 이미지 검색',
-      url: 'https://s.1688.com/youyuan/index.htm' },
-    { icon: '🛍️', name: 'AliExpress 이미지 검색',
-      url: 'https://www.aliexpress.com/p/calp-plus/photo-search.html' },
-    { icon: '🛒', name: 'Amazon 이미지 검색',
-      url: 'https://www.amazon.com/camera/snap' },
-  ]);
+  const container = $('links-image-search');
+  container.innerHTML = '';
+
+  const platforms = [
+    { icon: '🔍', name: 'Google Lens',           url: 'https://lens.google.com/' },
+    { icon: '🏭', name: '1688 이미지 검색',        url: 'https://s.1688.com/youyuan/index.htm' },
+    { icon: '🛍️', name: 'AliExpress 이미지 검색', url: 'https://www.aliexpress.com/p/calp-plus/photo-search.html' },
+    { icon: '🛒', name: 'Amazon 이미지 검색',      url: 'https://www.amazon.com/camera/snap' },
+  ];
+
+  platforms.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'link-item';
+    btn.style.cssText = 'width:100%;text-align:left;cursor:pointer;background:white;border:1px solid #e9ecef;';
+    btn.innerHTML = `<span class="link-icon">${p.icon}</span><span>${p.name}</span>`;
+    btn.addEventListener('click', () => openImageSearchTab(p.url, _injectImageToFileInput));
+    container.appendChild(btn);
+  });
 }
 
 // ===== 2단계: AI 제목 + 대본 생성 (쇼핑쇼츠 가이드 기반) =====

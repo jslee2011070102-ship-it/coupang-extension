@@ -14,7 +14,11 @@
     "https://www.coupang.com/*",
     "https://translate.googleapis.com/*",
     "https://translate.google.com/*",
-    "https://api.anthropic.com/*"
+    "https://api.anthropic.com/*",
+    "https://lens.google.com/*",
+    "https://s.1688.com/*",
+    "https://www.aliexpress.com/*",
+    "https://www.amazon.com/*"
   ],
   "action": {
     "default_title": "쿠팡 영상 소재 수집기 열기",
