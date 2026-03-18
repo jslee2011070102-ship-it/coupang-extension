@@ -9,6 +9,7 @@ const state = {
   keywordEn: '',
   keywordZh: '',
   productInfo: null,      // 쿠팡 페이지에서 추출한 제품 전체 정보
+  productImageUrl: '',    // 제품 대표 이미지 URL (이미지 검색용)
   script: '',
   titleCandidates: [],    // 생성된 제목 후보 3개
   selectedTitle: '',      // 선택된 제목
@@ -131,11 +132,15 @@ async function initKeyword() {
   // 상태 저장
   state.productInfo = info;
   state.keyword = info.keyword;
+  state.productImageUrl = info.productImageUrl || '';
 
   // 키워드 헤더 표시
   $('keyword-ko').textContent = info.title || info.keyword;
   show('keyword-result');
   hide('search-links-placeholder');
+
+  // 이미지 검색 섹션 렌더링 (번역 전에 먼저 표시)
+  renderImageSection();
 
   // 대본 탭 — 제품 분석 카드 렌더링
   renderProductCard(info);
@@ -245,6 +250,66 @@ function renderShopLinks(keywordEn, keywordZh) {
 function renderSearchLinks() {
   renderSnsLinks(state.keywordEn, state.keywordZh);
   renderShopLinks(state.keywordEn, state.keywordZh);
+  renderOpenAllButton();
+}
+
+/** 모두 열기 버튼 활성화 (키워드 번역 완료 후) */
+function renderOpenAllButton() {
+  const en = encodeURIComponent(state.keywordEn);
+  const zh = encodeURIComponent(state.keywordZh);
+  const enNoSpace = encodeURIComponent(state.keywordEn.replace(/ /g, ''));
+
+  const allUrls = [
+    `https://www.tiktok.com/search/video?q=${en}`,
+    `https://www.douyin.com/search/${zh}`,
+    `https://www.instagram.com/explore/tags/${enNoSpace}`,
+    `https://www.xiaohongshu.com/search_result?keyword=${zh}`,
+    `https://s.1688.com/selloffer/offerlist.htm?keywords=${zh}`,
+    `https://www.aliexpress.com/wholesale?SearchText=${en}`,
+    `https://www.amazon.com/s?k=${en}`,
+    `https://www.alibaba.com/trade/search?SearchText=${en}`,
+  ];
+
+  const btn = $('btn-open-all-tabs');
+  btn.onclick = () => allUrls.forEach(url => chrome.tabs.create({ url, active: false }));
+  show('btn-open-all-wrap');
+}
+
+/** 이미지 검색 섹션: 이미지 URL 자동방식 또는 클립보드 방식 */
+function renderImageSection() {
+  const imgUrl = state.productImageUrl;
+
+  if (imgUrl) {
+    // ── A: 이미지 URL 자동 방식 ──
+    // 붙여넣기 영역 숨기기, 자동 이미지 미리보기 표시
+    $('image-paste-zone').style.display = 'none';
+    hide('image-paste-clear-row');
+    hide('image-search-hint-manual');
+    show('image-search-hint-auto');
+
+    const preview = $('image-paste-preview');
+    preview.src = imgUrl;
+    preview.style.display = 'block';
+
+    // 이미지 검색 링크 (URL 파라미터 방식 — 클립보드 불필요)
+    $('image-search-links-hint').textContent = '→ 클릭하면 해당 사이트에서 바로 검색됩니다';
+    show('image-search-links');
+    buildImageUrlSearchLinks(imgUrl);
+  } else {
+    // ── B: Fallback — 기존 클립보드 방식 ──
+    $('image-paste-zone').style.display = '';
+    show('image-search-hint-manual');
+    hide('image-search-hint-auto');
+  }
+}
+
+/** 이미지 URL 파라미터 방식 검색 링크 생성 */
+function buildImageUrlSearchLinks(imgUrl) {
+  const enc = encodeURIComponent(imgUrl);
+  buildLinkItems('links-image-search', [
+    { icon: '🔍', name: 'Google Lens',    url: `https://lens.google.com/uploadbyurl?url=${enc}` },
+    { icon: '🏭', name: '1688 이미지 검색', url: `https://s.1688.com/youyuan/index.htm?imageAddress=${enc}` },
+  ]);
 }
 
 // ===== 이미지 검색 (Ctrl+V 붙여넣기 → 자동 주입) =====
@@ -908,6 +973,7 @@ function resetProductState() {
   state.keywordEn     = '';
   state.keywordZh     = '';
   state.productInfo   = null;
+  state.productImageUrl = '';
   state.script        = '';
   state.titleCandidates = [];
   state.selectedTitle = '';
@@ -926,7 +992,15 @@ function resetProductState() {
   // 영상 탭 초기화
   hide('section-sns-links');
   hide('section-shop-links');
+  hide('btn-open-all-wrap');
   show('search-links-placeholder');
+  // 이미지 검색 섹션 초기화
+  const preview = $('image-paste-preview');
+  if (preview) { preview.style.display = 'none'; preview.src = ''; }
+  $('image-paste-zone').style.display = '';
+  hide('image-search-links');
+  show('image-search-hint-manual');
+  hide('image-search-hint-auto');
   hide('script-loading');
   hide('script-error');
   updateChecklist();

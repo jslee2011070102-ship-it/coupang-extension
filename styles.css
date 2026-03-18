@@ -654,6 +654,23 @@ label {
   display: block;
 }
 
+/* ===== 모두 열기 버튼 ===== */
+.btn-open-all {
+  width: 100%;
+  padding: 11px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  background: #e8133a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.2px;
+  transition: background 0.15s;
+}
+.btn-open-all:hover { background: #c40f30; }
+.btn-open-all:active { background: #a00d29; }
+
 /* ===== 유틸리티 ===== */
 .hidden {
   display: none !important;

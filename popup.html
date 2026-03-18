@@ -62,6 +62,13 @@
         쿠팡 상품 페이지를 열면<br>영상 소스가 표시됩니다
       </div>
 
+      <!-- 모두 열기 버튼 -->
+      <div id="btn-open-all-wrap" class="hidden mt-12">
+        <button id="btn-open-all-tabs" class="btn-open-all">
+          🚀 모두 열기 <span style="opacity:0.8;font-weight:400;">(SNS + 쇼핑몰 8개 탭)</span>
+        </button>
+      </div>
+
       <!-- 섹션 B: 쇼츠 & SNS -->
       <div id="section-sns-links" class="hidden mt-12">
         <div class="link-group-title">📲 쇼츠 &amp; SNS</div>
@@ -81,7 +88,8 @@
       <div id="section-image-search" class="mt-12">
         <div class="link-group-title">
           🔍 이미지로 검색
-          <span class="link-group-hint">제품 캡처 후 Ctrl+V → 이미지 검색 버튼 클릭 → 해당 사이트에서 Ctrl+V</span>
+          <span id="image-search-hint-auto" class="link-group-hint hidden">쿠팡 제품 이미지로 자동 검색합니다</span>
+          <span id="image-search-hint-manual" class="link-group-hint">제품 캡처 후 Ctrl+V → 이미지 검색 버튼 클릭</span>
         </div>
         <div id="image-paste-zone" class="image-paste-zone" tabindex="0">
           <div id="image-paste-hint" class="image-paste-hint">
@@ -93,7 +101,7 @@
           <button id="btn-image-paste-clear" class="btn btn-secondary btn-sm">🗑 이미지 제거</button>
         </div>
         <div id="image-search-links" class="hidden mt-8">
-          <div class="text-small mb-4" style="color:#aaa;">→ 버튼 클릭 후 해당 사이트에서 Ctrl+V로 검색</div>
+          <div id="image-search-links-hint" class="text-small mb-4" style="color:#aaa;"></div>
           <div id="links-image-search" class="link-list"></div>
         </div>
       </div>

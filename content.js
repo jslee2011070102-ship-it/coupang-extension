@@ -24,7 +24,8 @@ function extractProductInfo() {
     reviewCount: null,
     category: null,
     features: [],
-    description: null
+    description: null,
+    productImageUrl: null
   };
 
   // ── 키워드 (URL q= 파라미터) ──
@@ -177,6 +178,21 @@ function extractProductInfo() {
 
   // 중복 제거 + 최대 5개
   info.features = [...new Set(info.features)].slice(0, 5);
+
+  // ── 제품 대표 이미지 URL ──
+  const imgSelectors = [
+    '.prod-image__detail img',
+    '[class*="prod-image"] img',
+    '.thumbnail-image img',
+    '[class*="thumbnail"] img'
+  ];
+  for (const sel of imgSelectors) {
+    const el = document.querySelector(sel);
+    if (el && el.src && el.src.startsWith('http')) {
+      info.productImageUrl = el.src;
+      break;
+    }
+  }
 
   // ── 상품 설명 (첫 텍스트 단락) ──
   const descSelectors = [
