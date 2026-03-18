@@ -214,16 +214,25 @@ function buildLinkItems(containerId, list) {
 function renderSnsLinks(keywordEn, keywordZh) {
   const en = encodeURIComponent(keywordEn);
   const zh = encodeURIComponent(keywordZh);
+  const enNoSpace = encodeURIComponent(keywordEn.replace(/ /g, ''));
 
   buildLinkItems('links-sns', [
     { icon: '🎵', name: 'TikTok',
       url: `https://www.tiktok.com/search?q=${en}` },
     { icon: '🎵', name: '抖音 (Douyin)',
       url: `https://www.douyin.com/search/${zh}` },
+    { icon: '⚡', name: '快手 (Kwai)',
+      url: `https://www.kwai.com/search?keyword=${en}` },
+    { icon: '📺', name: 'Bilibili (B站)',
+      url: `https://search.bilibili.com/video?keyword=${zh}` },
     { icon: '📸', name: 'Instagram',
-      url: `https://www.instagram.com/explore/tags/${encodeURIComponent(keywordEn.replace(/ /g, ''))}` },
+      url: `https://www.instagram.com/explore/tags/${enNoSpace}` },
     { icon: '🛍️', name: '小红书 (Xiaohongshu)',
       url: `https://www.xiaohongshu.com/search_result?keyword=${zh}` },
+    { icon: '🍋', name: 'Lemon8',
+      url: `https://www.lemon8-app.com/search?keyword=${en}` },
+    { icon: '📌', name: 'Pinterest',
+      url: `https://www.pinterest.com/search/pins/?q=${en}` },
   ]);
   show('section-sns-links');
 }
@@ -242,6 +251,14 @@ function renderShopLinks(keywordEn, keywordZh) {
       url: `https://s.1688.com/selloffer/offerlist.htm?keywords=${zh}` },
     { icon: '🌐', name: 'Alibaba.com',
       url: `https://www.alibaba.com/trade/search?SearchText=${en}` },
+    { icon: '🧡', name: 'Taobao (淘宝)',
+      url: `https://s.taobao.com/search?q=${zh}` },
+    { icon: '🏪', name: 'Tmall (天猫)',
+      url: `https://list.tmall.com/search_product.htm?q=${zh}` },
+    { icon: '🌏', name: 'Lazada',
+      url: `https://www.lazada.com/catalog/?q=${en}` },
+    { icon: '🟠', name: 'Shopee',
+      url: `https://shopee.com/search?keyword=${en}` },
   ]);
   show('section-shop-links');
 }
@@ -260,14 +277,24 @@ function renderOpenAllButton() {
   const enNoSpace = encodeURIComponent(state.keywordEn.replace(/ /g, ''));
 
   const allUrls = [
-    `https://www.tiktok.com/search/video?q=${en}`,
+    // SNS
+    `https://www.tiktok.com/search?q=${en}`,
     `https://www.douyin.com/search/${zh}`,
+    `https://www.kwai.com/search?keyword=${en}`,
+    `https://search.bilibili.com/video?keyword=${zh}`,
     `https://www.instagram.com/explore/tags/${enNoSpace}`,
     `https://www.xiaohongshu.com/search_result?keyword=${zh}`,
-    `https://s.1688.com/selloffer/offerlist.htm?keywords=${zh}`,
-    `https://www.aliexpress.com/wholesale?SearchText=${en}`,
+    `https://www.lemon8-app.com/search?keyword=${en}`,
+    `https://www.pinterest.com/search/pins/?q=${en}`,
+    // 쇼핑몰
     `https://www.amazon.com/s?k=${en}`,
+    `https://www.aliexpress.com/wholesale?SearchText=${en}`,
+    `https://s.1688.com/selloffer/offerlist.htm?keywords=${zh}`,
     `https://www.alibaba.com/trade/search?SearchText=${en}`,
+    `https://s.taobao.com/search?q=${zh}`,
+    `https://list.tmall.com/search_product.htm?q=${zh}`,
+    `https://www.lazada.com/catalog/?q=${en}`,
+    `https://shopee.com/search?keyword=${en}`,
   ];
 
   const btn = $('btn-open-all-tabs');
@@ -307,8 +334,16 @@ function renderImageSection() {
 function buildImageUrlSearchLinks(imgUrl) {
   const enc = encodeURIComponent(imgUrl);
   buildLinkItems('links-image-search', [
-    { icon: '🔍', name: 'Google Lens',    url: `https://lens.google.com/uploadbyurl?url=${enc}` },
-    { icon: '🏭', name: '1688 이미지 검색', url: `https://s.1688.com/youyuan/index.htm?imageAddress=${enc}` },
+    { icon: '🔍', name: 'Google Lens',
+      url: `https://lens.google.com/uploadbyurl?url=${enc}` },
+    { icon: '🏭', name: '1688 이미지 검색',
+      url: `https://s.1688.com/youyuan/index.htm?imageAddress=${enc}` },
+    { icon: '🟡', name: 'Yandex 이미지 검색',
+      url: `https://yandex.com/images/search?url=${enc}&rpt=imageview` },
+    { icon: '🔵', name: 'Baidu 이미지 검색',
+      url: `https://graph.baidu.com/pcpage/similar?originImageUrl=${enc}` },
+    { icon: '🪟', name: 'Bing 이미지 검색',
+      url: `https://www.bing.com/images/search?view=detailv2&iss=sbi&q=imgurl:${enc}` },
   ]);
 }
 
