@@ -77,6 +77,27 @@
         <div id="links-shop" class="link-list"></div>
       </div>
 
+      <!-- 섹션 D: 이미지로 검색 (항상 표시) -->
+      <div id="section-image-search" class="mt-12">
+        <div class="link-group-title">
+          🔍 이미지로 검색
+          <span class="link-group-hint">제품 캡처 후 Ctrl+V → 이미지 검색 버튼 클릭 → 해당 사이트에서 Ctrl+V</span>
+        </div>
+        <div id="image-paste-zone" class="image-paste-zone" tabindex="0">
+          <div id="image-paste-hint" class="image-paste-hint">
+            📸 여기 클릭 후 <strong>Ctrl+V</strong>
+          </div>
+          <img id="image-paste-preview" alt="붙여넣은 이미지" style="display:none;">
+        </div>
+        <div id="image-paste-clear-row" class="hidden mt-4" style="text-align:right;">
+          <button id="btn-image-paste-clear" class="btn btn-secondary btn-sm">🗑 이미지 제거</button>
+        </div>
+        <div id="image-search-links" class="hidden mt-8">
+          <div class="text-small mb-4" style="color:#aaa;">→ 버튼 클릭 후 해당 사이트에서 Ctrl+V로 검색</div>
+          <div id="links-image-search" class="link-list"></div>
+        </div>
+      </div>
+
     </div>
 
     <!-- 탭 2: AI 대본 / TTS / 자막 -->

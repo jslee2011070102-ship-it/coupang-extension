@@ -607,6 +607,53 @@ label {
   font-size: 10px;
 }
 
+/* ===== 이미지 붙여넣기 영역 ===== */
+.image-paste-zone {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  overflow: hidden;
+  outline: none;
+  background: #fafafa;
+}
+
+.image-paste-zone.focused,
+.image-paste-zone:focus {
+  border-color: #e8133a;
+  background: #fff5f7;
+}
+
+.image-paste-zone.drag-over {
+  border-color: #e8133a;
+  background: #ffe8ed;
+}
+
+.image-paste-hint {
+  text-align: center;
+  color: #bbb;
+  font-size: 11px;
+  padding: 16px;
+  line-height: 1.9;
+  pointer-events: none;
+}
+
+.image-paste-hint strong {
+  color: #e8133a;
+  font-size: 12px;
+}
+
+#image-paste-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  display: block;
+}
+
 /* ===== 유틸리티 ===== */
 .hidden {
   display: none !important;

@@ -247,6 +247,81 @@ function renderSearchLinks() {
   renderShopLinks(state.keywordEn, state.keywordZh);
 }
 
+// ===== 이미지 검색 (Ctrl+V 붙여넣기) =====
+
+(function initImageSearch() {
+  const pasteZone  = $('image-paste-zone');
+  const pasteHint  = $('image-paste-hint');
+  const preview    = $('image-paste-preview');
+  const clearRow   = $('image-paste-clear-row');
+  const linksWrap  = $('image-search-links');
+
+  // 이미지 표시 공통 함수
+  function showPastedImage(blobOrUrl) {
+    const url = typeof blobOrUrl === 'string' ? blobOrUrl : URL.createObjectURL(blobOrUrl);
+    preview.src = url;
+    preview.style.display = 'block';
+    pasteHint.style.display = 'none';
+    show('image-paste-clear-row');
+    show('image-search-links');
+    renderImageSearchLinks();
+  }
+
+  // 이미지 제거
+  $('btn-image-paste-clear').addEventListener('click', () => {
+    preview.src = '';
+    preview.style.display = 'none';
+    pasteHint.style.display = '';
+    hide('image-paste-clear-row');
+    hide('image-search-links');
+    pasteZone.classList.remove('focused');
+  });
+
+  // 클릭 시 포커스
+  pasteZone.addEventListener('click', () => pasteZone.focus());
+  pasteZone.addEventListener('focus', () => pasteZone.classList.add('focused'));
+  pasteZone.addEventListener('blur',  () => pasteZone.classList.remove('focused'));
+
+  // Ctrl+V 이미지 붙여넣기 — 전체 document에서 수신
+  document.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const blob = item.getAsFile();
+        if (blob) showPastedImage(blob);
+        break;
+      }
+    }
+  });
+
+  // 드래그 앤 드롭도 지원
+  pasteZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    pasteZone.classList.add('drag-over');
+  });
+  pasteZone.addEventListener('dragleave', () => pasteZone.classList.remove('drag-over'));
+  pasteZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    pasteZone.classList.remove('drag-over');
+    const file = e.dataTransfer?.files?.[0];
+    if (file && file.type.startsWith('image/')) showPastedImage(file);
+  });
+})();
+
+function renderImageSearchLinks() {
+  buildLinkItems('links-image-search', [
+    { icon: '🔍', name: 'Google Lens',
+      url: 'https://lens.google.com/' },
+    { icon: '🏭', name: '1688 이미지 검색',
+      url: 'https://s.1688.com/youyuan/index.htm' },
+    { icon: '🛍️', name: 'AliExpress 이미지 검색',
+      url: 'https://www.aliexpress.com/p/calp-plus/photo-search.html' },
+    { icon: '🛒', name: 'Amazon 이미지 검색',
+      url: 'https://www.amazon.com/camera/snap' },
+  ]);
+}
+
 // ===== 2단계: AI 제목 + 대본 생성 (쇼핑쇼츠 가이드 기반) =====
 
 $('btn-generate-script').addEventListener('click', generateScript);
