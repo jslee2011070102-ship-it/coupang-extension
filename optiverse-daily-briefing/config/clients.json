@@ -1,0 +1,29 @@
+{
+  "clients": [
+    {
+      "id": "client_001",
+      "name": "순식랩",
+      "category": "건기식/다이어트",
+      "coupang_category_id": "305736",
+      "keywords": [
+        "파우치 다이어트 쉐이크",
+        "단백질 보충제",
+        "지방연소 보조제",
+        "카르니틴",
+        "다이어트 쉐이크"
+      ],
+      "competitors": [
+        { "name": "슬림핏",     "product_url": "https://www.coupang.com/vp/products/example1" },
+        { "name": "버닝랩",     "product_url": "https://www.coupang.com/vp/products/example2" },
+        { "name": "프로틴웍스", "product_url": "https://www.coupang.com/vp/products/example3" }
+      ],
+      "target_customer": "운동 없이 간편하게 관리하려는 20~30대 여성",
+      "notify_email": "manager@sunsiklab.com",
+      "alert_sensitivity": {
+        "price_change_pct": 5,
+        "review_surge_count": 30
+      },
+      "news_keywords": ["다이어트", "단백질", "건기식", "체중감량"]
+    }
+  ]
+}

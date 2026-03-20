@@ -1,0 +1,69 @@
+name: Daily Briefing
+
+on:
+  schedule:
+    - cron: "0 17 * * *"   # UTC 17:00 = 한국 오전 02:00
+  workflow_dispatch:         # 수동 실행 (테스트용)
+    inputs:
+      client_id:
+        description: "특정 고객사 ID만 실행 (비워두면 전체)"
+        required: false
+        default: ""
+      dry_run:
+        description: "dry-run 모드 (발송 없이 HTML만 생성)"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  run-briefing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Python 3.11 설정
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+
+      - name: 브리핑 실행
+        run: |
+          ARGS=""
+          if [ -n "${{ github.event.inputs.client_id }}" ]; then
+            ARGS="$ARGS --client ${{ github.event.inputs.client_id }}"
+          fi
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          python main.py $ARGS
+        env:
+          COUPANG_ACCESS_KEY:  ${{ secrets.COUPANG_ACCESS_KEY }}
+          COUPANG_SECRET_KEY:  ${{ secrets.COUPANG_SECRET_KEY }}
+          NAVER_CLIENT_ID:     ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          CLAUDE_API_KEY:      ${{ secrets.CLAUDE_API_KEY }}
+          SENDGRID_API_KEY:    ${{ secrets.SENDGRID_API_KEY }}
+          SLACK_WEBHOOK_URL:   ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: 생성된 HTML 아티팩트 저장
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: briefing-html-${{ github.run_number }}
+          path: logs/html/
+          retention-days: 30
+
+      - name: 로그 아티팩트 저장
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: briefing-logs-${{ github.run_number }}
+          path: logs/*.log
+          retention-days: 14

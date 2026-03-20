@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{CLIENT_NAME}} 데일리 브리핑 - {{DATE}}</title>
+  <style>
+    /* 토스 스타일 이메일 템플릿 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+                   'Pretendard', 'Noto Sans KR', sans-serif;
+      color: #191f28;
+      line-height: 1.6;
+    }
+
+    .email-wrapper {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #ffffff;
+    }
+
+    /* 헤더 */
+    .header {
+      background: #0064ff;
+      padding: 32px 40px 28px;
+      color: #fff;
+    }
+    .header-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .header-meta {
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    /* 본문 */
+    .content {
+      padding: 0 40px 40px;
+    }
+
+    /* 섹션 카드 */
+    section {
+      margin-top: 28px;
+      border: 1px solid #e8ecef;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 18px 24px 16px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e8ecef;
+    }
+    .section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #191f28;
+    }
+    .section-body {
+      padding: 20px 24px;
+    }
+
+    /* 섹션별 색상 */
+    #market-trends .section-icon    { background: #e8f0ff; }
+    #category-trends .section-icon  { background: #e6f9f0; }
+    #competitor-trends .section-icon { background: #fff3e0; }
+    #action-items .section-icon     { background: #fce8e8; }
+
+    /* 리스트 스타일 */
+    .section-body ul {
+      list-style: none;
+      padding: 0;
+    }
+    .section-body ul li {
+      padding: 8px 0 8px 20px;
+      position: relative;
+      font-size: 14px;
+      color: #3d4654;
+      border-bottom: 1px solid #f2f4f6;
+    }
+    .section-body ul li:last-child { border-bottom: none; }
+    .section-body ul li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: #0064ff;
+      font-weight: 700;
+    }
+
+    /* 액션 아이템 */
+    .action-item {
+      padding: 14px 16px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border-left: 3px solid #0064ff;
+    }
+    .action-item:last-child { margin-bottom: 0; }
+    .action-item .action-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: #0064ff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .action-item .action-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #191f28;
+      margin-bottom: 4px;
+    }
+    .action-item .action-desc {
+      font-size: 13px;
+      color: #6b7684;
+    }
+
+    /* 강조 태그 */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-up   { background: #fff0f0; color: #e53935; }
+    .tag-down { background: #e8f0ff; color: #0064ff; }
+    .tag-new  { background: #e6f9f0; color: #00a878; }
+
+    /* 구분선 */
+    .divider {
+      height: 1px;
+      background: #e8ecef;
+      margin: 24px 0;
+    }
+
+    /* 푸터 */
+    .footer {
+      background: #f8f9fa;
+      padding: 24px 40px;
+      border-top: 1px solid #e8ecef;
+      text-align: center;
+    }
+    .footer p {
+      font-size: 12px;
+      color: #8b95a1;
+      margin-bottom: 4px;
+    }
+    .footer a {
+      color: #0064ff;
+      text-decoration: none;
+    }
+
+    /* 반응형 */
+    @media (max-width: 480px) {
+      .header { padding: 24px 20px 20px; }
+      .content { padding: 0 20px 32px; }
+      .footer  { padding: 20px; }
+      .section-body { padding: 16px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="email-wrapper">
+
+    <!-- 헤더 -->
+    <div class="header">
+      <div class="header-badge">Daily Briefing</div>
+      <h1>{{CLIENT_NAME}} 데일리 브리핑</h1>
+      <div class="header-meta">{{DATE}} &nbsp;|&nbsp; {{CATEGORY}} &nbsp;|&nbsp; Optiverse</div>
+    </div>
+
+    <!-- 본문 -->
+    <div class="content">
+
+      <!-- Claude가 생성한 4개 섹션 삽입 위치 -->
+      {{SECTIONS}}
+
+    </div>
+
+    <!-- 푸터 -->
+    <div class="footer">
+      <p>이 브리핑은 <strong>옵티버스</strong>가 자동으로 생성했습니다.</p>
+      <p>문의: <a href="mailto:support@optiverse.co.kr">support@optiverse.co.kr</a></p>
+      <p style="margin-top:8px; color:#c5cdd6;">
+        © 2025 Optiverse. All rights reserved.
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
