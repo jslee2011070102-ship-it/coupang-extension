@@ -49,7 +49,10 @@ jobs:
           NAVER_CLIENT_ID:     ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
           CLAUDE_API_KEY:      ${{ secrets.CLAUDE_API_KEY }}
-          SENDGRID_API_KEY:    ${{ secrets.SENDGRID_API_KEY }}
+          EMAIL_HOST:          ${{ secrets.EMAIL_HOST }}
+          EMAIL_PORT:          ${{ secrets.EMAIL_PORT }}
+          EMAIL_USER:          ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD:      ${{ secrets.EMAIL_PASSWORD }}
           SLACK_WEBHOOK_URL:   ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: 생성된 HTML 아티팩트 저장

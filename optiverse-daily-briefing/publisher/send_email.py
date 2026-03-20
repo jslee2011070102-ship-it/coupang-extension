@@ -1,5 +1,5 @@
 """
-SendGrid 이메일 발송기
+Naver Works SMTP 이메일 발송기
 - HTML 브리핑 이메일 발송
 - 실패 시 재시도 1회
 - 실패 알림: 슬랙 웹훅
@@ -8,40 +8,40 @@ SendGrid 이메일 발송기
 import os
 import logging
 import time
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 import requests
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, To, From
 
 logger = logging.getLogger(__name__)
 
-SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "smtp.worksmobile.com")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "465"))
+EMAIL_USER = os.environ.get("EMAIL_USER", "")
+EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
 SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "")
 
-FROM_EMAIL = "briefing@optiverse.co.kr"
+FROM_EMAIL = EMAIL_USER
 FROM_NAME = "옵티버스 데일리 브리핑"
 
 
 def _send_once(to_email: str, subject: str, html_content: str) -> bool:
-    """SendGrid API로 이메일 1회 발송. 성공 시 True 반환."""
-    if not SENDGRID_API_KEY:
-        raise ValueError("SENDGRID_API_KEY 환경변수가 설정되지 않았습니다.")
+    """SMTP SSL로 이메일 1회 발송. 성공 시 True 반환."""
+    if not EMAIL_USER or not EMAIL_PASSWORD:
+        raise ValueError("EMAIL_USER 또는 EMAIL_PASSWORD 환경변수가 설정되지 않았습니다.")
 
-    message = Mail(
-        from_email=From(FROM_EMAIL, FROM_NAME),
-        to_emails=To(to_email),
-        subject=subject,
-        html_content=html_content,
-    )
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = subject
+    msg["From"] = f"{FROM_NAME} <{FROM_EMAIL}>"
+    msg["To"] = to_email
+    msg.attach(MIMEText(html_content, "html", "utf-8"))
 
-    sg = SendGridAPIClient(api_key=SENDGRID_API_KEY)
-    response = sg.send(message)
+    with smtplib.SMTP_SSL(EMAIL_HOST, EMAIL_PORT) as server:
+        server.login(EMAIL_USER, EMAIL_PASSWORD)
+        server.sendmail(FROM_EMAIL, to_email, msg.as_string())
 
-    if response.status_code in (200, 202):
-        logger.info(f"이메일 발송 성공: {to_email} (status: {response.status_code})")
-        return True
-    else:
-        logger.error(f"이메일 발송 실패: {to_email} (status: {response.status_code})")
-        return False
+    logger.info(f"이메일 발송 성공: {to_email}")
+    return True
 
 
 def send_briefing(client: dict, html_content: str) -> bool:
