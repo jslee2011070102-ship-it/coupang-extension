@@ -18,7 +18,7 @@
         { "name": "프로틴웍스", "product_url": "https://www.coupang.com/vp/products/example3" }
       ],
       "target_customer": "운동 없이 간편하게 관리하려는 20~30대 여성",
-      "notify_email": "manager@sunsiklab.com",
+      "notify_email": "yoyoyo147258@naver.com",
       "alert_sensitivity": {
         "price_change_pct": 5,
         "review_surge_count": 30
