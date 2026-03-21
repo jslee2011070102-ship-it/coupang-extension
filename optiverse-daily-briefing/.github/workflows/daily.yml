@@ -36,14 +36,16 @@ jobs:
       - name: 브리핑 실행
         run: |
           ARGS=""
-          if [ -n "${{ github.event.inputs.client_id }}" ]; then
-            ARGS="$ARGS --client ${{ github.event.inputs.client_id }}"
+          if [ -n "$INPUT_CLIENT_ID" ]; then
+            ARGS="--client $INPUT_CLIENT_ID"
           fi
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+          if [ "$INPUT_DRY_RUN" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
           python main.py $ARGS
         env:
+          INPUT_CLIENT_ID:     ${{ github.event.inputs.client_id }}
+          INPUT_DRY_RUN:       ${{ github.event.inputs.dry_run }}
           COUPANG_ACCESS_KEY:  ${{ secrets.COUPANG_ACCESS_KEY }}
           COUPANG_SECRET_KEY:  ${{ secrets.COUPANG_SECRET_KEY }}
           NAVER_CLIENT_ID:     ${{ secrets.NAVER_CLIENT_ID }}
